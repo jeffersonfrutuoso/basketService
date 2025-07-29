@@ -1,5 +1,7 @@
 package dev.java.ecommerce.basketService.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -20,6 +22,8 @@ public class BasketEntity {
     private BigDecimal totalPrice;
     private List<ProductEntity> products;
     private Status status;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private PaymentMethod paymentMethod;
 
 
     public void calculateTotalPrice(){

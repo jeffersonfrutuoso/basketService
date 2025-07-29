@@ -2,6 +2,7 @@ package dev.java.ecommerce.basketService.service;
 
 import dev.java.ecommerce.basketService.client.response.PlatziProductResponse;
 import dev.java.ecommerce.basketService.controller.request.BasketRequest;
+import dev.java.ecommerce.basketService.controller.request.PaymentMethodRequest;
 import dev.java.ecommerce.basketService.domain.BasketEntity;
 import dev.java.ecommerce.basketService.domain.ProductEntity;
 import dev.java.ecommerce.basketService.domain.Status;
@@ -50,5 +51,34 @@ public class BasketService {
     }
 
 
+    public BasketEntity updateBasket(String basketId, BasketRequest basketRequest){
+        BasketEntity savedBasket = getBasketById(basketId);
+
+
+        List<ProductEntity> products = new ArrayList<>();
+        basketRequest.products().forEach(productRequest -> {
+            PlatziProductResponse platziProductResponse = productService.getProductById(productRequest.id());
+            products.add(ProductEntity.builder()
+                    .id(platziProductResponse.id())
+                    .title(platziProductResponse.title())
+                    .price(platziProductResponse.price())
+                    .quantity(productRequest.quantity())
+                    .build());
+        });
+
+        savedBasket.setProducts(products);
+
+        savedBasket.calculateTotalPrice();
+        return basketRepository.save(savedBasket);
+    }
+
+    public BasketEntity payBasket(String basketId, PaymentMethodRequest request){
+        BasketEntity savedBasket = getBasketById(basketId);
+
+        savedBasket.setPaymentMethod(request.getPaymentMethod());
+        savedBasket.setStatus(Status.SOLD);
+        return basketRepository.save(savedBasket);
+
+    }
 
 }
